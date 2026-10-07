@@ -1,0 +1,37 @@
+{
+  "name": "parkstamp",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "preview": "vite preview",
+    "data:build": "tsx scripts/build-park-catalog.ts"
+  },
+  "dependencies": {
+    "idb": "^8.0.4",
+    "maplibre-gl": "^6.13.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.4",
+    "vite-plugin-pwa": "^2.0.0",
+    "workbox-window": "^7.4.1"
+  },
+  "devDependencies": {
+    "@turf/bbox": "^7.3.4",
+    "@turf/boolean-point-in-polygon": "^7.3.4",
+    "@turf/centroid": "^7.3.4",
+    "@turf/helpers": "^7.3.4",
+    "@types/geojson": "^7946.0.16",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "oxlint": "^1.81.0",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.2",
+    "vite": "^8.3.0"
+  }
+}

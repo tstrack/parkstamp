@@ -1,0 +1,594 @@
+:root {
+  --ink: #1b2a4a;
+  --stamp: #c43c2c;
+  --paper: #f3efe6;
+  --rule: #c9c2b4;
+  --forest: #2f4a3c;
+  --paper-deep: #e8e1d2;
+  --text: #1b2a4a;
+  --muted: #5c6578;
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-body: "Source Sans 3", "Segoe UI", sans-serif;
+  --shadow-soft: 0 10px 30px rgba(27, 42, 74, 0.08);
+  color: var(--text);
+  background: var(--paper);
+  font-family: var(--font-body);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(ellipse at top, rgba(255, 255, 255, 0.55), transparent 55%),
+    linear-gradient(180deg, #f7f3eb 0%, var(--paper) 40%, #ebe4d6 100%);
+  background-attachment: fixed;
+}
+
+/* Subtle topographic contour lines — single fixed layer scaled to the viewport. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.1;
+  background-image: url("/topo-lines.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+a {
+  color: var(--forest);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.app-shell {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: 1.25rem 1.1rem 2.5rem;
+}
+
+.page {
+  /* Opacity only — CSS transform on a MapLibre ancestor breaks canvas sizing
+     until something like opening DevTools forces a resize. */
+  animation: page-enter 280ms ease-out;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.hero {
+  text-align: center;
+  padding: 1.5rem 0 1rem;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 1.25rem;
+}
+
+.hero-logo {
+  margin-bottom: 0.5rem;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 8vw, 3.4rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0.15rem 0;
+  color: var(--ink);
+}
+
+.pitch {
+  margin: 0.35rem 0 0.75rem;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.progress-line {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.98rem;
+}
+
+.progress-line strong {
+  color: var(--stamp);
+}
+
+.page-header {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 5vw, 2.4rem);
+  margin: 0.35rem 0;
+  color: var(--ink);
+}
+
+.page-header__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.page-header__title-row .page-title {
+  margin: 0.35rem 0;
+  min-width: 0;
+}
+
+.page-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: stretch;
+  margin: 0.85rem 0 1rem;
+}
+
+.page-toolbar .search-field {
+  margin: 0;
+}
+
+.system-select {
+  display: flex;
+  align-items: stretch;
+}
+
+.system-select select {
+  appearance: none;
+  border: 1px solid var(--rule);
+  background:
+    rgba(255, 255, 255, 0.55)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231B2A4A' d='M1 1l5 5 5-5'/%3E%3C/svg%3E")
+    no-repeat right 0.7rem center;
+  border-radius: 2px;
+  padding: 0.7rem 2rem 0.7rem 0.75rem;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 9.5rem;
+}
+
+.system-select select:focus {
+  outline: 2px solid color-mix(in srgb, var(--ink) 35%, transparent);
+  outline-offset: 1px;
+}
+
+.back-link {
+  display: inline-block;
+  text-decoration: none;
+  color: var(--forest);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.search-field {
+  display: block;
+  margin: 0.85rem 0 1rem;
+}
+
+.search-field input {
+  width: 100%;
+  border: 1px solid var(--rule);
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 2px;
+  padding: 0.7rem 0.85rem;
+  color: var(--ink);
+}
+
+.search-field input:focus {
+  outline: 2px solid color-mix(in srgb, var(--ink) 35%, transparent);
+  outline-offset: 1px;
+}
+
+.passport-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.passport-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.65rem;
+  align-items: baseline;
+  padding: 0.85rem 0.15rem;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+
+a.passport-row {
+  grid-template-columns: 1fr auto auto;
+}
+
+.passport-row:hover,
+.passport-row:focus-visible {
+  background: color-mix(in srgb, var(--paper-deep) 70%, transparent);
+}
+
+.passport-row__name {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.passport-row__meta {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
+}
+
+.passport-row__chevron {
+  color: var(--rule);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.passport-row--started .passport-row__meta {
+  color: var(--stamp);
+  font-weight: 600;
+}
+
+.park-row {
+  grid-template-columns: 1fr;
+  gap: 0.2rem;
+}
+
+.park-row .passport-row__meta {
+  font-size: 0.9rem;
+}
+
+.park-row--visited {
+  box-shadow: inset 3px 0 0 var(--stamp);
+  padding-left: 0.65rem;
+}
+
+.park-row--visited .passport-row__name {
+  color: var(--stamp);
+}
+
+.stamp-badge {
+  display: inline-block;
+  margin-top: 0.15rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--stamp);
+  font-weight: 700;
+}
+
+.view-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--ink);
+  margin: 0.5rem 0 0.25rem;
+}
+
+.view-toggle--compact {
+  flex: 0 0 auto;
+  margin: 0;
+  align-self: center;
+}
+
+.view-toggle--compact button {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.85rem;
+}
+
+.view-toggle button {
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  padding: 0.55rem 0.75rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.view-toggle button.is-active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+@media (max-width: 420px) {
+  .page-header__title-row {
+    flex-wrap: wrap;
+  }
+
+  .page-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .system-select select {
+    width: 100%;
+  }
+}
+
+.park-system {
+  margin: 0 0 0.15rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+}
+
+.park-system--state {
+  color: var(--ink);
+}
+
+.park-system--national {
+  color: var(--forest);
+}
+
+.park-map {
+  /* Fixed px height avoids vh/DevTools viewport quirks during init */
+  height: 420px;
+  width: 100%;
+  border: 1px solid var(--rule);
+  margin-top: 0.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.park-tooltip .maplibregl-popup-content {
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  box-shadow: var(--shadow-soft);
+  padding: 0.45rem 0.6rem;
+  font-family: var(--font-body);
+}
+
+.park-tooltip .maplibregl-popup-tip {
+  border-top-color: var(--ink);
+}
+
+.park-tooltip__inner strong {
+  display: block;
+  font-size: 0.92rem;
+  line-height: 1.25;
+}
+
+.park-tooltip__meta {
+  margin-top: 0.15rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.park-tooltip__status {
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--stamp);
+}
+
+.map-marker {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: var(--ink);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  padding: 0;
+  transition:
+    background 200ms ease,
+    color 200ms ease,
+    transform 200ms ease,
+    filter 200ms ease;
+}
+
+/* National parks: wider shield with the same white stroke + shadow weight as circles */
+.map-marker--national {
+  width: 19px;
+  height: 22px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--forest);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+}
+
+.map-marker__shield {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.map-marker__shield path {
+  fill: currentColor;
+  stroke: #fff;
+  /* ~2× circle border: paint-order covers the inner half of the stroke */
+  stroke-width: 4;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+}
+
+.map-marker--visited {
+  background: var(--stamp);
+  transform: scale(1.15);
+}
+
+.map-marker--national.map-marker--visited {
+  background: transparent;
+  color: var(--stamp);
+}
+
+.park-location {
+  margin: 0.15rem 0 0.5rem;
+  color: var(--muted);
+}
+
+.maps-link {
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--forest) 40%, transparent);
+}
+
+.stamp-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 2rem 0 1rem;
+  padding: 1.5rem 1rem;
+  border: 1px dashed var(--rule);
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.stamp-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.stamp-button__label {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.stamp-button.is-stamped .stamp-button__label {
+  color: var(--stamp);
+}
+
+.stamp-button.is-animating .stamp-logo {
+  animation: stamp-press 450ms ease;
+}
+
+@keyframes stamp-press {
+  0% {
+    transform: scale(1.2) rotate(-6deg);
+    opacity: 0.2;
+  }
+  55% {
+    transform: scale(0.92) rotate(2deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.stamp-date {
+  margin: 0;
+  font-family: var(--font-display);
+  color: var(--stamp);
+  font-size: 1.15rem;
+}
+
+.text-button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.page-footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.95rem;
+}
+
+.page-footer a {
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.about-page .prose {
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.about-page__title-row {
+  justify-content: flex-start;
+  gap: 0.65rem;
+}
+
+.about-page__mark {
+  flex-shrink: 0;
+}
+
+.about-page h2 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  margin: 1.6rem 0 0.5rem;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.error {
+  color: var(--stamp);
+  font-weight: 600;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.maplibregl-ctrl-attrib {
+  font-size: 10px;
+}

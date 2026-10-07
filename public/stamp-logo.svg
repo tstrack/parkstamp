@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="ParkStamp">
+  <circle cx="64" cy="64" r="60" fill="none" stroke="#1B2A4A" stroke-width="4"/>
+  <circle cx="64" cy="64" r="52" fill="none" stroke="#1B2A4A" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <path d="M64 28 L70 48 H92 L74 60 L80 80 L64 68 L48 80 L54 60 L36 48 H58 Z" fill="#1B2A4A"/>
+  <path d="M48 86 C52 78, 76 78, 80 86 L78 98 H50 Z" fill="#2F4A3C"/>
+  <text x="64" y="118" text-anchor="middle" font-family="Georgia, serif" font-size="9" letter-spacing="2" fill="#1B2A4A">PARKSTAMP</text>
+</svg>

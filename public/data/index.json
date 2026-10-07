@@ -1,0 +1,361 @@
+{
+  "generatedAt": "2026-10-07T20:17:58.597Z",
+  "source": "U.S. Geological Survey (USGS) Gap Analysis Project (GAP), Protected Areas Database of the United States (PAD-US) 4.1",
+  "sourceUrl": "https://doi.org/10.5066/P96WBCHS",
+  "filter": "Des_Tp = SP (State Park) OR NP (National Park)",
+  "states": [
+    {
+      "code": "AK",
+      "name": "Alaska",
+      "parkCount": 18,
+      "stateParkCount": 10,
+      "nationalParkCount": 8
+    },
+    {
+      "code": "AL",
+      "name": "Alabama",
+      "parkCount": 26,
+      "stateParkCount": 26,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "AR",
+      "name": "Arkansas",
+      "parkCount": 45,
+      "stateParkCount": 44,
+      "nationalParkCount": 1
+    },
+    {
+      "code": "AZ",
+      "name": "Arizona",
+      "parkCount": 26,
+      "stateParkCount": 23,
+      "nationalParkCount": 3
+    },
+    {
+      "code": "CA",
+      "name": "California",
+      "parkCount": 149,
+      "stateParkCount": 140,
+      "nationalParkCount": 9
+    },
+    {
+      "code": "CO",
+      "name": "Colorado",
+      "parkCount": 131,
+      "stateParkCount": 127,
+      "nationalParkCount": 4
+    },
+    {
+      "code": "CT",
+      "name": "Connecticut",
+      "parkCount": 112,
+      "stateParkCount": 112,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "DE",
+      "name": "Delaware",
+      "parkCount": 56,
+      "stateParkCount": 56,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "FL",
+      "name": "Florida",
+      "parkCount": 115,
+      "stateParkCount": 111,
+      "nationalParkCount": 4
+    },
+    {
+      "code": "GA",
+      "name": "Georgia",
+      "parkCount": 59,
+      "stateParkCount": 59,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "HI",
+      "name": "Hawaii",
+      "parkCount": 88,
+      "stateParkCount": 86,
+      "nationalParkCount": 2
+    },
+    {
+      "code": "IA",
+      "name": "Iowa",
+      "parkCount": 61,
+      "stateParkCount": 61,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "ID",
+      "name": "Idaho",
+      "parkCount": 31,
+      "stateParkCount": 30,
+      "nationalParkCount": 1
+    },
+    {
+      "code": "IL",
+      "name": "Illinois",
+      "parkCount": 39,
+      "stateParkCount": 39,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "IN",
+      "name": "Indiana",
+      "parkCount": 40,
+      "stateParkCount": 39,
+      "nationalParkCount": 1
+    },
+    {
+      "code": "KS",
+      "name": "Kansas",
+      "parkCount": 26,
+      "stateParkCount": 26,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "KY",
+      "name": "Kentucky",
+      "parkCount": 50,
+      "stateParkCount": 49,
+      "nationalParkCount": 1
+    },
+    {
+      "code": "LA",
+      "name": "Louisiana",
+      "parkCount": 28,
+      "stateParkCount": 28,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "MA",
+      "name": "Massachusetts",
+      "parkCount": 219,
+      "stateParkCount": 219,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "MD",
+      "name": "Maryland",
+      "parkCount": 117,
+      "stateParkCount": 116,
+      "nationalParkCount": 1
+    },
+    {
+      "code": "ME",
+      "name": "Maine",
+      "parkCount": 134,
+      "stateParkCount": 133,
+      "nationalParkCount": 1
+    },
+    {
+      "code": "MI",
+      "name": "Michigan",
+      "parkCount": 91,
+      "stateParkCount": 90,
+      "nationalParkCount": 1
+    },
+    {
+      "code": "MN",
+      "name": "Minnesota",
+      "parkCount": 76,
+      "stateParkCount": 75,
+      "nationalParkCount": 1
+    },
+    {
+      "code": "MO",
+      "name": "Missouri",
+      "parkCount": 62,
+      "stateParkCount": 61,
+      "nationalParkCount": 1
+    },
+    {
+      "code": "MS",
+      "name": "Mississippi",
+      "parkCount": 24,
+      "stateParkCount": 24,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "MT",
+      "name": "Montana",
+      "parkCount": 57,
+      "stateParkCount": 55,
+      "nationalParkCount": 2
+    },
+    {
+      "code": "NC",
+      "name": "North Carolina",
+      "parkCount": 75,
+      "stateParkCount": 74,
+      "nationalParkCount": 1
+    },
+    {
+      "code": "ND",
+      "name": "North Dakota",
+      "parkCount": 15,
+      "stateParkCount": 14,
+      "nationalParkCount": 1
+    },
+    {
+      "code": "NE",
+      "name": "Nebraska",
+      "parkCount": 8,
+      "stateParkCount": 8,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "NH",
+      "name": "New Hampshire",
+      "parkCount": 50,
+      "stateParkCount": 50,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "NJ",
+      "name": "New Jersey",
+      "parkCount": 74,
+      "stateParkCount": 74,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "NM",
+      "name": "New Mexico",
+      "parkCount": 37,
+      "stateParkCount": 34,
+      "nationalParkCount": 3
+    },
+    {
+      "code": "NV",
+      "name": "Nevada",
+      "parkCount": 22,
+      "stateParkCount": 20,
+      "nationalParkCount": 2
+    },
+    {
+      "code": "NY",
+      "name": "New York",
+      "parkCount": 628,
+      "stateParkCount": 628,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "OH",
+      "name": "Ohio",
+      "parkCount": 90,
+      "stateParkCount": 89,
+      "nationalParkCount": 1
+    },
+    {
+      "code": "OK",
+      "name": "Oklahoma",
+      "parkCount": 48,
+      "stateParkCount": 48,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "OR",
+      "name": "Oregon",
+      "parkCount": 19,
+      "stateParkCount": 18,
+      "nationalParkCount": 1
+    },
+    {
+      "code": "PA",
+      "name": "Pennsylvania",
+      "parkCount": 128,
+      "stateParkCount": 128,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "RI",
+      "name": "Rhode Island",
+      "parkCount": 111,
+      "stateParkCount": 111,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "SC",
+      "name": "South Carolina",
+      "parkCount": 44,
+      "stateParkCount": 43,
+      "nationalParkCount": 1
+    },
+    {
+      "code": "SD",
+      "name": "South Dakota",
+      "parkCount": 7,
+      "stateParkCount": 5,
+      "nationalParkCount": 2
+    },
+    {
+      "code": "TN",
+      "name": "Tennessee",
+      "parkCount": 68,
+      "stateParkCount": 67,
+      "nationalParkCount": 1
+    },
+    {
+      "code": "TX",
+      "name": "Texas",
+      "parkCount": 89,
+      "stateParkCount": 87,
+      "nationalParkCount": 2
+    },
+    {
+      "code": "UT",
+      "name": "Utah",
+      "parkCount": 59,
+      "stateParkCount": 54,
+      "nationalParkCount": 5
+    },
+    {
+      "code": "VA",
+      "name": "Virginia",
+      "parkCount": 60,
+      "stateParkCount": 53,
+      "nationalParkCount": 7
+    },
+    {
+      "code": "VT",
+      "name": "Vermont",
+      "parkCount": 61,
+      "stateParkCount": 61,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "WA",
+      "name": "Washington",
+      "parkCount": 197,
+      "stateParkCount": 194,
+      "nationalParkCount": 3
+    },
+    {
+      "code": "WI",
+      "name": "Wisconsin",
+      "parkCount": 129,
+      "stateParkCount": 129,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "WV",
+      "name": "West Virginia",
+      "parkCount": 41,
+      "stateParkCount": 41,
+      "nationalParkCount": 0
+    },
+    {
+      "code": "WY",
+      "name": "Wyoming",
+      "parkCount": 37,
+      "stateParkCount": 35,
+      "nationalParkCount": 2
+    }
+  ],
+  "totalParks": 3977,
+  "stateParkCount": 3904,
+  "nationalParkCount": 73
+}
