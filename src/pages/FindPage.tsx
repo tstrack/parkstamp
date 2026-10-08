@@ -3,6 +3,7 @@ import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { ParkListRow } from "../components/ParkListRow";
 import { ProgressBar } from "../components/ProgressBar";
 import { SearchField } from "../components/SearchField";
+import { Stamp } from "../components/Stamp";
 import { StatePicker } from "../components/StatePicker";
 import { loadAllParks, loadCatalogIndex } from "../lib/data";
 import {
@@ -151,6 +152,54 @@ export function FindPage() {
     <div className="page find-page">
       <h1 className="page-title find-page__title">Find</h1>
 
+      {error && <p className="error">{error}</p>}
+
+      {!searching && ready && yourStates.length === 0 && (
+        <div className="find-empty">
+          <Stamp
+            className="find-empty__stamp"
+            label="PARKSTAMP • FIND A PARK •"
+            tone="forest"
+            rotation={4}
+            size={148}
+          />
+          <p className="find-empty__lead">Start your collection</p>
+          <p className="find-empty__copy">
+            Search for a park by name, or browse a state to stamp your first
+            visit.
+          </p>
+        </div>
+      )}
+
+      {!searching && yourStates.length > 0 && (
+        <section className="your-states" aria-label="Your states">
+          <h2 className="your-states__heading">Your states</h2>
+          <ul className="your-states__list">
+            {yourStates.map((s) => (
+              <li key={s.code}>
+                <button
+                  type="button"
+                  className="state-progress-card"
+                  onClick={() => navigate(`/state/${s.code.toLowerCase()}`)}
+                >
+                  <div className="state-progress-card__top">
+                    <span className="state-progress-card__name">{s.name}</span>
+                    <span className="state-progress-card__count">
+                      {s.visited} / {s.total}
+                    </span>
+                  </div>
+                  <ProgressBar
+                    value={s.visited}
+                    max={s.total}
+                    label={`${s.name} progress`}
+                  />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <div className="find-search">
         <SearchField
           value={query}
@@ -159,8 +208,6 @@ export function FindPage() {
           placeholder="Search parks…"
         />
       </div>
-
-      {error && <p className="error">{error}</p>}
 
       {searching ? (
         <>
@@ -207,59 +254,14 @@ export function FindPage() {
           )}
         </>
       ) : (
-        <>
-          {ready && yourStates.length === 0 && (
-            <div className="content-card find-empty">
-              <p className="find-empty__lead">Start your first stamp</p>
-              <p>
-                Search for a park by name, or browse a state to begin filling
-                your passport.
-              </p>
-            </div>
-          )}
-
-          {yourStates.length > 0 && (
-            <section className="your-states" aria-label="Your states">
-              <h2 className="your-states__heading">Your states</h2>
-              <ul className="your-states__list">
-                {yourStates.map((s) => (
-                  <li key={s.code}>
-                    <button
-                      type="button"
-                      className="state-progress-card"
-                      onClick={() =>
-                        navigate(`/state/${s.code.toLowerCase()}`)
-                      }
-                    >
-                      <div className="state-progress-card__top">
-                        <span className="state-progress-card__name">
-                          {s.name}
-                        </span>
-                        <span className="state-progress-card__count">
-                          {s.visited} / {s.total}
-                        </span>
-                      </div>
-                      <ProgressBar
-                        value={s.visited}
-                        max={s.total}
-                        label={`${s.name} progress`}
-                      />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {index && (
-            <StatePicker
-              states={index.states}
-              open={pickerOpen}
-              onToggle={() => setPickerOpen((v) => !v)}
-              onSelect={(code) => navigate(`/state/${code}`)}
-            />
-          )}
-        </>
+        index && (
+          <StatePicker
+            states={index.states}
+            open={pickerOpen}
+            onToggle={() => setPickerOpen((v) => !v)}
+            onSelect={(code) => navigate(`/state/${code}`)}
+          />
+        )
       )}
     </div>
   );

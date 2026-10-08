@@ -9,7 +9,7 @@ export function AppHeader() {
   const { resolved } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const logoSrc =
-    resolved === "dark" ? "/logo-reversed.png" : "/logo-color.png";
+    resolved === "dark" ? "/logo-reversed.svg" : "/logo-color.svg";
 
   return (
     <>
@@ -19,8 +19,8 @@ export function AppHeader() {
             <img
               src={logoSrc}
               alt="ParkStamp — Your Park Passport"
-              width={536}
-              height={160}
+              width={459}
+              height={97}
               decoding="async"
             />
           </Link>

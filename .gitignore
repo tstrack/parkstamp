@@ -23,3 +23,6 @@ scripts/.cache
 
 # TypeScript
 *.tsbuildinfo
+
+# Local Netlify folder
+.netlify

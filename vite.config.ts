@@ -12,11 +12,9 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: [
-        "favicon.png",
-        "favicon-32.png",
-        "icon-192.png",
-        "logo-color.png",
-        "seal-color.png",
+        "logo-color.svg",
+        "logo-reversed.svg",
+        "seal-color.svg",
         "topo-lines.svg",
       ],
       manifest: {
@@ -29,21 +27,21 @@ export default defineConfig({
         start_url: "/",
         icons: [
           {
-            src: "icon-192.png",
-            sizes: "192x192",
-            type: "image/png",
+            src: "seal-color.svg",
+            sizes: "any",
+            type: "image/svg+xml",
             purpose: "any",
           },
           {
-            src: "icon-192.png",
-            sizes: "192x192",
-            type: "image/png",
+            src: "seal-color.svg",
+            sizes: "any",
+            type: "image/svg+xml",
             purpose: "maskable",
           },
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,svg,png,ico,woff2}"],
+        globPatterns: ["**/*.{js,css,html,svg,ico,woff2}"],
         globIgnores: ["**/data/states/**"],
         runtimeCaching: [
           {

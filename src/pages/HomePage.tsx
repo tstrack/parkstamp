@@ -161,12 +161,34 @@ export function HomePage() {
       {error && <p className="error">{error}</p>}
       {loading && <p className="muted">Opening your passport…</p>}
 
-      {!loading && !error && filtered.length === 0 && (
+      {!loading && !error && filtered.length === 0 && entries.length === 0 && (
         <div className="passport-empty">
-          <p>No stamps yet.</p>
-          <p>
-            <Link to="/find">Find a park</Link> to stamp your first visit.
+          <Stamp
+            className="passport-empty__stamp"
+            label="PARKSTAMP • YOUR PASSPORT •"
+            tone="rust"
+            rotation={-5}
+            size={148}
+          />
+          <p className="passport-empty__lead">Ready for your first stamp</p>
+          <p className="passport-empty__copy">
+            Find a park you’ve visited and press it into your passport.
           </p>
+          <Link to="/find" className="btn-primary passport-empty__cta">
+            Find a park
+          </Link>
+        </div>
+      )}
+
+      {!loading && !error && filtered.length === 0 && entries.length > 0 && (
+        <div className="passport-empty passport-empty--filter">
+          <p className="passport-empty__lead">No stamps in this filter</p>
+          <p className="passport-empty__copy">
+            Try All parks, or find another park to stamp.
+          </p>
+          <Link to="/find" className="btn-primary passport-empty__cta">
+            Find a park
+          </Link>
         </div>
       )}
 
