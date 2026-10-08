@@ -1,6 +1,7 @@
-import type { CatalogIndex, StateCatalog } from "../types";
+import type { CatalogIndex, Park, StateCatalog } from "../types";
 
 const indexCache = new Map<string, Promise<unknown>>();
+let allParksPromise: Promise<Park[]> | null = null;
 
 async function fetchJson<T>(url: string): Promise<T> {
   const existing = indexCache.get(url);
@@ -21,19 +22,28 @@ export function loadStateCatalog(code: string): Promise<StateCatalog> {
   return fetchJson<StateCatalog>(`/data/states/${code.toLowerCase()}.json`);
 }
 
+/** Load parks for one state (uses the shared JSON cache). */
+export async function loadParksForState(code: string): Promise<Park[]> {
+  const catalog = await loadStateCatalog(code);
+  return catalog.parks;
+}
+
+/** Load every park catalog once; subsequent calls reuse the promise. */
+export function loadAllParks(): Promise<Park[]> {
+  if (!allParksPromise) {
+    allParksPromise = loadCatalogIndex().then(async (index) => {
+      const catalogs = await Promise.all(
+        index.states.map((entry) => loadStateCatalog(entry.code)),
+      );
+      return catalogs.flatMap((catalog) => catalog.parks);
+    });
+  }
+  return allParksPromise;
+}
+
 export function mapsUrl(lat: number, lng: number, name: string): string {
   const q = encodeURIComponent(`${name} @${lat},${lng}`);
   return `https://maps.google.com/?q=${q}`;
 }
 
-export function formatVisitDate(iso: string): string {
-  try {
-    return new Intl.DateTimeFormat(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    }).format(new Date(iso));
-  } catch {
-    return iso.slice(0, 10);
-  }
-}
+export { formatVisitMonth as formatVisitDate } from "./stamp";

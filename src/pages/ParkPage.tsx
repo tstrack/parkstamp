@@ -1,24 +1,40 @@
+import { ArrowLeft, MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { StampLogo } from "../components/StampLogo";
-import { formatVisitDate, loadStateCatalog, mapsUrl } from "../lib/data";
+import { iconDefaults } from "../components/icons";
+import { Stamp } from "../components/Stamp";
+import { todayIsoDate } from "../lib/dates";
+import { loadStateCatalog, mapsUrl } from "../lib/data";
+import {
+  formatStampDate,
+  stampLabelForPark,
+  stampRotationFromId,
+  stampToneFromId,
+} from "../lib/stamp";
 import { parseSystemFilter, systemLabel } from "../lib/systemFilter";
 import { useVisits } from "../hooks/useVisits";
 import type { Park } from "../types";
 
+function prefersReducedMotion(): boolean {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 export function ParkPage() {
   const { code = "", parkId = "" } = useParams();
   const [searchParams] = useSearchParams();
-  const view = searchParams.get("view") === "list" ? "list" : "map";
   const system = parseSystemFilter(searchParams.get("system"));
   const [park, setPark] = useState<Park | null>(null);
+  const [stateName, setStateName] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [animating, setAnimating] = useState(false);
-  const { isVisited, getVisitedAt, toggle } = useVisits();
+  const [visitDate, setVisitDate] = useState(todayIsoDate());
+  const [editingDate, setEditingDate] = useState(false);
+  const { isVisited, getVisitedAt, stamp, updateDate, unstamp } = useVisits();
 
   useEffect(() => {
     loadStateCatalog(code)
       .then((catalog) => {
+        setStateName(catalog.name);
         const found = catalog.parks.find((p) => p.id === parkId) ?? null;
         setPark(found);
         if (!found) setError("Park not found.");
@@ -28,30 +44,43 @@ export function ParkPage() {
 
   const visited = park ? isVisited(park.id) : false;
   const visitedAt = park ? getVisitedAt(park.id) : undefined;
+  const today = todayIsoDate();
+  const backTo = `/state/${code.toLowerCase()}${
+    system !== "all" ? `?system=${system}` : ""
+  }`;
+  const backLabel = stateName || code.toUpperCase();
+
+  useEffect(() => {
+    if (visited && visitedAt) {
+      setVisitDate(visitedAt);
+    } else if (!visited) {
+      setVisitDate(todayIsoDate());
+    }
+    setEditingDate(false);
+  }, [parkId, visited, visitedAt]);
 
   const onStamp = async () => {
-    if (!park) return;
-    if (!visited) {
+    if (!park || visited) return;
+    if (!prefersReducedMotion()) {
       setAnimating(true);
-      window.setTimeout(() => setAnimating(false), 450);
+      window.setTimeout(() => setAnimating(false), 380);
     }
-    await toggle(park.id);
+    await stamp(park.id, visitDate);
   };
 
-  const backParams = new URLSearchParams();
-  if (view === "list") backParams.set("view", "list");
-  if (system !== "all") backParams.set("system", system);
-  const backQs = backParams.toString();
-  const backTo = `/state/${code.toLowerCase()}${backQs ? `?${backQs}` : ""}`;
+  const onRemove = async () => {
+    if (!park) return;
+    await unstamp(park.id);
+  };
+
+  const onSaveDate = async () => {
+    if (!park) return;
+    await updateDate(park.id, visitDate);
+    setEditingDate(false);
+  };
 
   return (
     <div className="page park-page">
-      <header className="page-header">
-        <Link className="back-link" to={backTo}>
-          ← Back to {code.toUpperCase()}
-        </Link>
-      </header>
-
       {error && <p className="error">{error}</p>}
       {!park && !error && <p className="muted">Loading…</p>}
 
@@ -61,41 +90,130 @@ export function ParkPage() {
             {systemLabel(park.system)}
           </p>
           <h1 className="page-title">{park.name}</h1>
-          <p className="park-location">{park.locationLabel}</p>
-          <a
-            className="maps-link"
-            href={mapsUrl(park.lat, park.lng, park.name)}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Open in Maps
-          </a>
+          <div className="park-meta-row">
+            <p className="park-location">{park.locationLabel}</p>
+            <a
+              className="maps-link"
+              href={mapsUrl(park.lat, park.lng, park.name)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <MapPin {...iconDefaults} size={18} />
+              Open in Maps
+            </a>
+          </div>
 
           <div className="stamp-stage">
-            <button
-              type="button"
-              className={`stamp-button ${visited ? "is-stamped" : ""} ${animating ? "is-animating" : ""}`}
-              onClick={onStamp}
-              aria-pressed={visited}
-            >
-              <StampLogo
-                size={160}
-                variant={visited ? "stamp" : "outline"}
-                stamped={visited}
-              />
-              <span className="stamp-button__label">
-                {visited ? "Stamped" : "Tap to stamp"}
-              </span>
-            </button>
-            {visited && visitedAt && (
-              <p className="stamp-date">{formatVisitDate(visitedAt)}</p>
-            )}
-            {visited && (
-              <button type="button" className="text-button" onClick={onStamp}>
-                Remove stamp
-              </button>
+            {visited ? (
+              <>
+                <div
+                  className={`stamp-button is-stamped ${animating ? "is-animating" : ""}`}
+                >
+                  <Stamp
+                    label={stampLabelForPark(park)}
+                    date={visitedAt ? formatStampDate(visitedAt) : undefined}
+                    tone={stampToneFromId(park.id)}
+                    rotation={stampRotationFromId(park.id)}
+                    size={168}
+                  />
+                  <span className="stamp-button__label">Stamped</span>
+                </div>
+                {visitedAt && !editingDate && (
+                  <p className="stamp-date">{formatStampDate(visitedAt)}</p>
+                )}
+                {editingDate ? (
+                  <div className="visit-date-edit">
+                    <label className="visit-date-field">
+                      <span className="visit-date-field__label">Visit date</span>
+                      <input
+                        type="date"
+                        value={visitDate}
+                        max={today}
+                        onChange={(e) => setVisitDate(e.target.value)}
+                      />
+                    </label>
+                    <div className="visit-date-edit__actions">
+                      <button
+                        type="button"
+                        className="btn-primary"
+                        onClick={onSaveDate}
+                      >
+                        Save date
+                      </button>
+                      <button
+                        type="button"
+                        className="text-button"
+                        onClick={() => {
+                          setVisitDate(visitedAt ?? today);
+                          setEditingDate(false);
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="stamp-actions">
+                    <button
+                      type="button"
+                      className="text-button"
+                      onClick={() => setEditingDate(true)}
+                    >
+                      Edit date
+                    </button>
+                    <button
+                      type="button"
+                      className="text-button"
+                      onClick={onRemove}
+                    >
+                      Remove stamp
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <div
+                  className={`stamp-button ${animating ? "is-animating" : ""}`}
+                >
+                  {animating ? (
+                    <Stamp
+                      label={stampLabelForPark(park)}
+                      date={formatStampDate(visitDate)}
+                      tone={stampToneFromId(park.id)}
+                      rotation={stampRotationFromId(park.id)}
+                      size={168}
+                    />
+                  ) : (
+                    <span className="stamp-button__empty" aria-hidden />
+                  )}
+                </div>
+                <label className="visit-date-field">
+                  <span className="visit-date-field__label">Visit date</span>
+                  <input
+                    type="date"
+                    value={visitDate}
+                    max={today}
+                    onChange={(e) => setVisitDate(e.target.value)}
+                  />
+                </label>
+                <button
+                  type="button"
+                  className="btn-primary"
+                  onClick={onStamp}
+                >
+                  Stamp this park
+                </button>
+              </>
             )}
           </div>
+
+          <p className="park-page__back">
+            <Link to={backTo}>
+              <ArrowLeft {...iconDefaults} size={18} />
+              Back to {backLabel}
+            </Link>
+          </p>
         </>
       )}
     </div>

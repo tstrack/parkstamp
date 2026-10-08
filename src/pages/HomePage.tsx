@@ -1,136 +1,203 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { StampLogo } from "../components/StampLogo";
-import { SearchField } from "../components/SearchField";
-import { SystemFilterSelect } from "../components/SystemFilterSelect";
-import { loadCatalogIndex } from "../lib/data";
+import { Stamp } from "../components/Stamp";
+import { loadCatalogIndex, loadStateCatalog } from "../lib/data";
 import {
-  parkCountForFilter,
+  formatStampDate,
+  stampLabelForPark,
+  stampRotationFromId,
+  stampToneFromId,
+} from "../lib/stamp";
+import {
   parseParkId,
   parseSystemFilter,
   totalCountForFilter,
 } from "../lib/systemFilter";
 import { useVisits } from "../hooks/useVisits";
-import type { CatalogIndex } from "../types";
+import type { Park } from "../types";
+
+type StampEntry = {
+  park: Park;
+  visitedAt: string;
+  stampedAt: string;
+};
 
 export function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const system = parseSystemFilter(searchParams.get("system"));
-  const [index, setIndex] = useState<CatalogIndex | null>(null);
+  const { visits, ready } = useVisits();
+  const [entries, setEntries] = useState<StampEntry[]>([]);
+  const [catalogTotals, setCatalogTotals] = useState<{
+    totalParks: number;
+    stateParkCount: number;
+    nationalParkCount: number;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [query, setQuery] = useState("");
-  const { visits } = useVisits();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     loadCatalogIndex()
-      .then(setIndex)
-      .catch(() => setError("Could not load park catalog."));
+      .then((index) => {
+        if (!cancelled) {
+          setCatalogTotals({
+            totalParks: index.totalParks,
+            stateParkCount: index.stateParkCount,
+            nationalParkCount: index.nationalParkCount,
+          });
+        }
+      })
+      .catch(() => {
+        /* progress total is optional */
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    let cancelled = false;
+
+    async function loadStamps() {
+      setLoading(true);
+      setError(null);
+      try {
+        const stateCodes = new Set<string>();
+        for (const parkId of visits.keys()) {
+          const parsed = parseParkId(parkId);
+          if (parsed) stateCodes.add(parsed.state.toLowerCase());
+        }
+
+        const catalogs = await Promise.all(
+          [...stateCodes].map((code) => loadStateCatalog(code)),
+        );
+        if (cancelled) return;
+
+        const byId = new Map<string, Park>();
+        for (const catalog of catalogs) {
+          for (const park of catalog.parks) byId.set(park.id, park);
+        }
+
+        const next: StampEntry[] = [];
+        for (const [parkId, visit] of visits) {
+          const park = byId.get(parkId);
+          if (park) {
+            next.push({
+              park,
+              visitedAt: visit.visitedAt,
+              stampedAt: visit.stampedAt,
+            });
+          }
+        }
+        next.sort((a, b) => b.stampedAt.localeCompare(a.stampedAt));
+        setEntries(next);
+      } catch {
+        if (!cancelled) setError("Could not load your stamps.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    void loadStamps();
+    return () => {
+      cancelled = true;
+    };
+  }, [visits, ready]);
+
+  const filtered = useMemo(() => {
+    if (system === "all") return entries;
+    return entries.filter((e) => e.park.system === system);
+  }, [entries, system]);
 
   const setSystem = (next: typeof system) => {
     setSearchParams(next === "all" ? {} : { system: next }, { replace: true });
   };
 
-  const stateProgress = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const parkId of visits.keys()) {
-      const parsed = parseParkId(parkId);
-      if (!parsed) continue;
-      if (system !== "all" && parsed.system !== system) continue;
-      counts.set(parsed.state, (counts.get(parsed.state) ?? 0) + 1);
-    }
-    return counts;
-  }, [visits, system]);
+  const totalParks = catalogTotals
+    ? totalCountForFilter(catalogTotals, system)
+    : 0;
 
-  const visitedCount = useMemo(() => {
-    let n = 0;
-    for (const count of stateProgress.values()) n += count;
-    return n;
-  }, [stateProgress]);
-
-  const states = useMemo(() => {
-    if (!index) return [];
-    const q = query.trim().toLowerCase();
-    return index.states
-      .filter((s) => parkCountForFilter(s, system) > 0)
-      .filter(
-        (s) =>
-          !q ||
-          s.name.toLowerCase().includes(q) ||
-          s.code.toLowerCase().includes(q),
-      )
-      .sort((a, b) => a.name.localeCompare(b.name));
-  }, [index, query, system]);
-
-  const statesStarted = useMemo(() => {
-    let n = 0;
-    for (const count of stateProgress.values()) if (count > 0) n += 1;
-    return n;
-  }, [stateProgress]);
-
-  const totalParks = index ? totalCountForFilter(index, system) : 0;
+  const emptySlots =
+    filtered.length === 0 ? 0 : filtered.length % 2 === 0 ? 0 : 1;
 
   return (
     <div className="page home-page">
-      <header className="hero">
-        <StampLogo size={88} variant="ink" className="hero-logo" />
-        <h1 className="brand">ParkStamp</h1>
-        <p className="pitch">Stamp the parks you’ve visited.</p>
-        {index && (
-          <p className="progress-line" aria-live="polite">
-            <strong>
-              {visitedCount} / {totalParks}
-            </strong>{" "}
-            parks · {statesStarted} states started
-          </p>
-        )}
-      </header>
-
-      <div className="page-toolbar">
-        <SearchField
-          label="Search states"
-          placeholder="Search states…"
-          value={query}
-          onChange={setQuery}
-        />
-        <SystemFilterSelect value={system} onChange={setSystem} />
+      <div className="segmented" role="group" aria-label="Park system">
+        <button
+          type="button"
+          className={`segmented__btn${system === "all" ? " segmented__btn--on" : ""}`}
+          aria-pressed={system === "all"}
+          onClick={() => setSystem("all")}
+        >
+          All
+        </button>
+        <button
+          type="button"
+          className={`segmented__btn${system === "national" ? " segmented__btn--on" : ""}`}
+          aria-pressed={system === "national"}
+          onClick={() => setSystem("national")}
+        >
+          National
+        </button>
+        <button
+          type="button"
+          className={`segmented__btn${system === "state" ? " segmented__btn--on" : ""}`}
+          aria-pressed={system === "state"}
+          onClick={() => setSystem("state")}
+        >
+          State
+        </button>
       </div>
 
-      {error && <p className="error">{error}</p>}
-      {!index && !error && <p className="muted">Opening your passport…</p>}
+      <p className="progress-chip" aria-live="polite">
+        <strong>
+          {filtered.length}
+          {totalParks > 0 ? ` / ${totalParks}` : ""}
+        </strong>{" "}
+        parks stamped
+      </p>
 
-      {index && (
-        <ul className="passport-list">
-          {states.map((state) => {
-            const visited = stateProgress.get(state.code) ?? 0;
-            const total = parkCountForFilter(state, system);
-            const href =
-              system === "all"
-                ? `/state/${state.code.toLowerCase()}`
-                : `/state/${state.code.toLowerCase()}?system=${system}`;
-            return (
-              <li key={state.code}>
-                <Link
-                  className={`passport-row ${visited > 0 ? "passport-row--started" : ""}`}
-                  to={href}
-                >
-                  <span className="passport-row__name">{state.name}</span>
-                  <span className="passport-row__meta">
-                    {visited} / {total}
-                  </span>
-                  <span className="passport-row__chevron" aria-hidden>
-                    ›
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+      {error && <p className="error">{error}</p>}
+      {loading && <p className="muted">Opening your passport…</p>}
+
+      {!loading && !error && filtered.length === 0 && (
+        <div className="passport-empty">
+          <p>No stamps yet.</p>
+          <p>
+            <Link to="/find">Find a park</Link> to stamp your first visit.
+          </p>
+        </div>
       )}
 
-      <footer className="page-footer">
-        <Link to="/about">About &amp; data credits</Link>
-      </footer>
+      {!loading && !error && (filtered.length > 0 || emptySlots > 0) && (
+        <ul className="stamp-grid">
+          {filtered.map(({ park, visitedAt }) => (
+            <li key={park.id}>
+              <Link
+                className="stamp-slot"
+                to={`/state/${park.state.toLowerCase()}/park/${park.id}`}
+              >
+                <Stamp
+                  label={stampLabelForPark(park)}
+                  date={formatStampDate(visitedAt)}
+                  tone={stampToneFromId(park.id)}
+                  rotation={stampRotationFromId(park.id)}
+                  size={118}
+                />
+                <span className="stamp-slot__caption">{park.name}</span>
+              </Link>
+            </li>
+          ))}
+          {Array.from({ length: emptySlots }, (_, i) => (
+            <li key={`empty-${i}`}>
+              <Link className="stamp-slot" to="/states">
+                <div className="stamp-slot__ring">Add a visit</div>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

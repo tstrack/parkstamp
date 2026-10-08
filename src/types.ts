@@ -37,7 +37,9 @@ export type StateCatalog = {
   parks: Park[];
 };
 
+/** Visit date is YYYY-MM-DD; stampedAt is when the stamp was created. */
 export type Visit = {
   parkId: string;
   visitedAt: string;
+  stampedAt: string;
 };

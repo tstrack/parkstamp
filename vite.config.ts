@@ -11,26 +11,39 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.svg", "stamp-logo.svg"],
+      includeAssets: [
+        "favicon.png",
+        "favicon-32.png",
+        "icon-192.png",
+        "logo-color.png",
+        "seal-color.png",
+        "topo-lines.svg",
+      ],
       manifest: {
         name: "ParkStamp",
         short_name: "ParkStamp",
         description: "Stamp the U.S. state parks you’ve visited",
-        theme_color: "#1B2A4A",
+        theme_color: "#F3EFE6",
         background_color: "#F3EFE6",
         display: "standalone",
         start_url: "/",
         icons: [
           {
-            src: "stamp-logo.svg",
-            sizes: "any",
-            type: "image/svg+xml",
-            purpose: "any maskable",
+            src: "icon-192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any",
+          },
+          {
+            src: "icon-192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "maskable",
           },
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,svg,ico,woff2}"],
+        globPatterns: ["**/*.{js,css,html,svg,png,ico,woff2}"],
         globIgnores: ["**/data/states/**"],
         runtimeCaching: [
           {

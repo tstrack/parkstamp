@@ -15,14 +15,14 @@ export function StampLogo({
     variant === "stamp" || stamped
       ? "var(--stamp)"
       : variant === "outline"
-        ? "var(--rule)"
-        : "var(--ink)";
+        ? "var(--stitch)"
+        : "currentColor";
   const fill =
     variant === "outline" && !stamped
       ? "transparent"
       : variant === "stamp" || stamped
         ? "var(--stamp)"
-        : "var(--ink)";
+        : "currentColor";
 
   return (
     <svg
@@ -58,8 +58,10 @@ export function StampLogo({
       />
       <path
         d="M50 84 C54 77, 74 77, 78 84 L76 96 H52 Z"
-        fill={stamped || variant === "stamp" ? "var(--forest)" : "var(--forest)"}
-        opacity={variant === "outline" && !stamped ? 0.2 : 0.9}
+        fill={
+          stamped || variant === "stamp" ? "var(--forest)" : "currentColor"
+        }
+        opacity={variant === "outline" && !stamped ? 0.2 : 0.55}
       />
     </svg>
   );

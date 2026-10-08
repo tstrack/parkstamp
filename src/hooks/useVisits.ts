@@ -8,7 +8,14 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { getAllVisits, getVisit, toggleVisit } from "../lib/visits";
+import {
+  getAllVisits,
+  getVisit,
+  stampVisit,
+  toggleVisit,
+  unstampVisit,
+  updateVisitDate,
+} from "../lib/visits";
 import type { Visit } from "../types";
 
 type VisitsContextValue = {
@@ -16,7 +23,11 @@ type VisitsContextValue = {
   ready: boolean;
   isVisited: (parkId: string) => boolean;
   getVisitedAt: (parkId: string) => string | undefined;
-  toggle: (parkId: string) => Promise<void>;
+  getStampedAt: (parkId: string) => string | undefined;
+  stamp: (parkId: string, visitDate?: string) => Promise<void>;
+  updateDate: (parkId: string, visitDate: string) => Promise<void>;
+  unstamp: (parkId: string) => Promise<void>;
+  toggle: (parkId: string, visitDate?: string) => Promise<void>;
   visitedCount: number;
 };
 
@@ -49,9 +60,42 @@ export function VisitsProvider({ children }: { children: ReactNode }) {
     [visits],
   );
 
-  const toggle = useCallback(async (parkId: string) => {
+  const getStampedAt = useCallback(
+    (parkId: string) => visits.get(parkId)?.stampedAt,
+    [visits],
+  );
+
+  const stamp = useCallback(async (parkId: string, visitDate?: string) => {
+    const next = await stampVisit(parkId, visitDate);
+    setVisits((prev) => {
+      const copy = new Map(prev);
+      copy.set(parkId, next);
+      return copy;
+    });
+  }, []);
+
+  const updateDate = useCallback(async (parkId: string, visitDate: string) => {
+    const next = await updateVisitDate(parkId, visitDate);
+    if (!next) return;
+    setVisits((prev) => {
+      const copy = new Map(prev);
+      copy.set(parkId, next);
+      return copy;
+    });
+  }, []);
+
+  const unstamp = useCallback(async (parkId: string) => {
+    await unstampVisit(parkId);
+    setVisits((prev) => {
+      const copy = new Map(prev);
+      copy.delete(parkId);
+      return copy;
+    });
+  }, []);
+
+  const toggle = useCallback(async (parkId: string, visitDate?: string) => {
     const existing = await getVisit(parkId);
-    const next = await toggleVisit(parkId, Boolean(existing));
+    const next = await toggleVisit(parkId, Boolean(existing), visitDate);
     setVisits((prev) => {
       const copy = new Map(prev);
       if (next) copy.set(parkId, next);
@@ -66,10 +110,24 @@ export function VisitsProvider({ children }: { children: ReactNode }) {
       ready,
       isVisited,
       getVisitedAt,
+      getStampedAt,
+      stamp,
+      updateDate,
+      unstamp,
       toggle,
       visitedCount: visits.size,
     }),
-    [visits, ready, isVisited, getVisitedAt, toggle],
+    [
+      visits,
+      ready,
+      isVisited,
+      getVisitedAt,
+      getStampedAt,
+      stamp,
+      updateDate,
+      unstamp,
+      toggle,
+    ],
   );
 
   return createElement(VisitsContext.Provider, { value }, children);
